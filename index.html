@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working days left this year</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDEFEA;
+    --card: #FBFCF9;
+    --ink: #1E2329;
+    --muted: #7E867D;
+    --hair: #D9DCD3;
+    --accent: #126E63;
+    --accent-dark: #0D564E;
+    --accent-tint: #DDEEE9;
+    --holiday: #B0521E;
+    --holiday-tint: #F3E3D8;
+    --amber: #9A6B12;
+    --amber-tint: #F2E7CF;
+    --red: #B23A3A;
+    --display: "Space Grotesk", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--body); line-height: 1.5;
+    -webkit-font-smoothing: antialiased; padding: clamp(20px, 5vw, 64px);
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 12px; margin-bottom: 20px;
+  }
+  .syncpill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em;
+    color: var(--muted); padding: 5px 11px;
+    border: 1px solid var(--hair); border-radius: 30px; background: var(--card);
+  }
+  .syncpill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .syncpill.is-synced { color: var(--accent); border-color: var(--accent-tint); }
+  .syncpill.is-synced .dot { background: var(--accent); }
+  .syncpill.is-local { color: var(--amber); border-color: var(--amber-tint); }
+  .syncpill.is-local .dot { background: var(--amber); }
+  .syncpill.is-saving .dot { background: var(--accent); animation: pulse 1s ease infinite; }
+  .syncpill.is-error { color: var(--red); border-color: #E7CFCF; }
+  .syncpill.is-error .dot { background: var(--red); }
+  @keyframes pulse { 50% { opacity: 0.25; } }
+
+  /* ---- Banner ---- */
+  .banner {
+    background: var(--amber-tint); border: 1px solid #E4D2A8;
+    border-radius: 4px; padding: 14px 16px; margin-bottom: 28px;
+    font-size: 13px; color: #6B4E10;
+  }
+  .banner b { font-weight: 600; }
+  .banner code {
+    font-family: var(--mono); font-size: 12px;
+    background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 3px;
+  }
+
+  /* ---- Header ---- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 24px; margin-bottom: 32px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 14px;
+  }
+  .count-line { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .count {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(56px, 12vw, 104px); line-height: 0.9; letter-spacing: -0.03em;
+  }
+  .count-label {
+    font-family: var(--display); font-weight: 500;
+    font-size: clamp(18px, 3.5vw, 26px); color: var(--ink); max-width: 18ch;
+  }
+  .today-line { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-top: 20px; }
+  .today-line strong { color: var(--accent); font-weight: 600; }
+  .controls { margin-top: 22px; }
+  .toggle {
+    display: inline-flex; align-items: center; gap: 10px;
+    cursor: pointer; font-size: 14px; color: var(--ink); user-select: none;
+  }
+  .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch {
+    width: 38px; height: 22px; border: 1.5px solid var(--ink);
+    border-radius: 22px; position: relative; transition: background .18s ease; flex: none;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 15px; height: 15px; border-radius: 50%; background: var(--ink);
+    transition: transform .18s ease, background .18s ease;
+  }
+  .toggle input:checked + .switch { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .switch::after { transform: translateX(16px); background: #fff; }
+  .toggle input:focus-visible + .switch { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    font-family: var(--body); font-size: 14px; font-weight: 600;
+    color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink);
+    border-radius: 4px; padding: 9px 18px; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .btn:hover { background: var(--ink); color: var(--card); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-small { padding: 6px 14px; font-size: 13px; }
+  .btn-solid { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-solid:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+  /* ---- Editor ---- */
+  .editor[hidden] { display: none; }
+  .editor {
+    background: var(--card); border: 1px solid var(--hair);
+    border-radius: 4px; padding: 22px 22px 18px; margin-bottom: 40px;
+  }
+  .editor-title { font-family: var(--display); font-weight: 700; font-size: 18px; margin: 0 0 4px; }
+  .editor-sub { font-size: 13px; color: var(--muted); margin: 0 0 18px; }
+  .editor-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-grow { flex: 1 1 220px; }
+  .flabel {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .field input, .field select {
+    font-family: var(--body); font-size: 14px; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--hair);
+    border-radius: 4px; padding: 9px 11px;
+  }
+  .field input:focus, .field select:focus {
+    outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .status { font-size: 13px; margin: 14px 0 0; min-height: 18px; color: var(--muted); }
+  .status.ok { color: var(--accent); }
+  .status.warn { color: var(--holiday); }
+  .entries { margin-top: 16px; }
+  .entry {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0; border-top: 1px dotted var(--hair); font-size: 13px;
+  }
+  .entry:first-child { border-top: none; }
+  .e-date { font-family: var(--mono); color: var(--muted); width: 92px; flex: none; }
+  .e-subj { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent); width: 52px; flex: none; }
+  .e-note { flex: 1; color: var(--ink); }
+  .e-del {
+    border: none; background: none; color: var(--muted);
+    cursor: pointer; font-size: 20px; line-height: 1; padding: 0 4px;
+  }
+  .e-del:hover { color: var(--holiday); }
+  .entries-empty { font-size: 13px; color: var(--muted); margin: 14px 0 0; }
+
+  /* ---- Months grid ---- */
+  .months { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 22px; }
+  .month { background: var(--card); border: 1px solid var(--hair); border-radius: 4px; padding: 20px 20px 14px; }
+  .month-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 1px solid var(--hair); padding-bottom: 10px; margin-bottom: 6px;
+  }
+  .month-name { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; }
+  .month-tally { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .month-tally b { color: var(--accent); font-weight: 600; }
+  ol.days { list-style: none; margin: 0; padding: 0; }
+  ol.days li { padding: 9px 0; border-bottom: 1px dotted var(--hair); }
+  ol.days li:last-child { border-bottom: none; }
+  .day-top { display: flex; align-items: center; gap: 12px; }
+  .subjects { margin: 7px 0 1px 46px; display: flex; flex-direction: column; gap: 4px; }
+  .subject { display: flex; align-items: baseline; gap: 9px; font-size: 13px; }
+  .subject .idx {
+    font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--muted);
+    background: var(--paper); border: 1px solid var(--hair); border-radius: 3px; padding: 1px 5px; flex: none;
+  }
+  .subject .sname { color: var(--ink); font-weight: 500; }
+  .subject .snote { color: var(--accent); font-weight: 600; }
+  .dow { font-family: var(--mono); font-size: 12px; color: var(--muted); width: 34px; flex: none; }
+  .dnum { font-family: var(--mono); font-weight: 500; font-size: 15px; width: 26px; flex: none; text-align: right; }
+  li.is-today {
+    background: var(--accent-tint); margin: 0 -10px; padding-left: 10px; padding-right: 10px;
+    border-radius: 3px; border-bottom-color: transparent;
+  }
+  li.is-today .dow { color: var(--accent); }
+  li.is-today .dnum { color: var(--accent); font-weight: 600; }
+  li.is-today .subject .sname { color: var(--accent); }
+  .today-tag {
+    margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #fff; background: var(--accent); padding: 2px 7px; border-radius: 3px;
+  }
+  li.is-holiday .dnum, li.is-holiday .dow { color: var(--holiday); }
+  .holiday-tag {
+    margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em;
+    color: var(--holiday); background: var(--holiday-tint); padding: 2px 7px; border-radius: 3px; text-align: right;
+  }
+  .empty {
+    grid-column: 1 / -1; text-align: center; padding: 60px 20px;
+    font-family: var(--display); font-size: 22px; color: var(--muted);
+  }
+  footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--hair);
+    font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.02em;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="syncpill" id="syncPill"><span class="dot"></span><span id="syncText">Starting…</span></span>
+      <button class="btn btn-small" id="editBtn">Edit</button>
+    </div>
+
+    <div class="banner" id="banner" style="display:none"></div>
+
+    <header class="masthead">
+      <p class="eyebrow">Working days remaining</p>
+      <div class="count-line">
+        <span class="count" id="count">—</span>
+        <span class="count-label" id="countLabel"></span>
+      </div>
+      <p class="today-line" id="todayLine"></p>
+      <div class="controls">
+        <label class="toggle">
+          <input type="checkbox" id="skipHols">
+          <span class="switch"></span>
+          <span>Skip public holidays (UK &amp; US Thanksgiving)</span>
+        </label>
+      </div>
+    </header>
+
+    <section class="editor" id="editor" hidden aria-label="Add a note">
+      <h2 class="editor-title">Add a note</h2>
+      <p class="editor-sub">Pick a day, choose a subject, write the note. Changes save and sync to everyone automatically.</p>
+      <div class="editor-row">
+        <label class="field">
+          <span class="flabel">Date</span>
+          <input type="date" id="eDate">
+        </label>
+        <label class="field">
+          <span class="flabel">Subject</span>
+          <select id="eSubject"></select>
+        </label>
+        <label class="field field-grow">
+          <span class="flabel">Note</span>
+          <input type="text" id="eNote" placeholder="e.g. Boston conference" maxlength="80">
+        </label>
+        <button class="btn" id="eAdd">Add</button>
+      </div>
+      <p class="status" id="eStatus" role="status"></p>
+      <div class="entries" id="entriesList"></div>
+    </section>
+
+    <main class="months" id="months"></main>
+    <footer id="foot"></footer>
+  </div>
+
+<script>
+(function () {
+  // ============================================================
+  //  SETTINGS  —  fill these in after the one-time Firebase setup.
+  //  Until you do, the page works locally but does NOT sync.
+  // ============================================================
+  const firebaseConfig = {
+    apiKey:      "PASTE_API_KEY",
+    authDomain:  "PASTE_AUTH_DOMAIN",
+    databaseURL: "PASTE_DATABASE_URL",
+    projectId:   "PASTE_PROJECT_ID",
+    appId:       "PASTE_APP_ID"
+  };
+  // People need this to switch on editing. Viewers don't. Change it to your own.
+  const EDIT_PASSPHRASE = "changeme";
+  // ============================================================
+
+  const FB_VERSION = "12.14.0";
+  const SUBJECTS = ["PA", "Phesi"];
+  const MONTHS = ["January","February","March","April","May","June",
+    "July","August","September","October","November","December"];
+  const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  // Starting notes (used to seed the database the very first time it connects).
+  let entries = [
+    {date:"2026-11-09", subject:"PA", note:"Boston conference"},
+    {date:"2026-11-10", subject:"PA", note:"Boston conference"},
+    {date:"2026-11-11", subject:"PA", note:"Boston conference"}
+  ];
+
+  let mode = "local";   // "local" | "cloud"
+  let editing = false;
+  let fb = null;        // { db, ref, set } once connected
+
+  // ---- date helpers ----
+  function midnight(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function key(d) { return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); }
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function isoKey(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseIso(iso) { return new Date(iso + "T00:00:00"); }
+  function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  // ---- holidays ----
+  function easterSunday(y) {
+    const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25);
+    const g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
+    const l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451);
+    const month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+    return new Date(y, month-1, day);
+  }
+  function nthWeekday(y, month, weekday, n) {
+    if (n > 0) {
+      const first = new Date(y, month, 1);
+      return new Date(y, month, 1 + ((7 + weekday - first.getDay()) % 7) + (n - 1) * 7);
+    }
+    const last = new Date(y, month + 1, 0);
+    return new Date(y, month, last.getDate() - ((7 + last.getDay() - weekday) % 7));
+  }
+  function substitute(d, taken) {
+    let s = new Date(d);
+    while (s.getDay() === 0 || s.getDay() === 6 || taken.has(key(s))) s.setDate(s.getDate() + 1);
+    return s;
+  }
+  function bankHolidays(y) {
+    const map = {}, taken = new Set();
+    const add = (d, name) => { map[key(d)] = name; taken.add(key(d)); };
+    add(substitute(new Date(y,0,1), taken), "New Year's Day");
+    const easter = easterSunday(y);
+    const gf = new Date(easter); gf.setDate(easter.getDate()-2);
+    const em = new Date(easter); em.setDate(easter.getDate()+1);
+    add(gf, "Good Friday"); add(em, "Easter Monday");
+    add(nthWeekday(y,4,1,1), "Early May bank holiday");
+    add(nthWeekday(y,4,1,-1), "Spring bank holiday");
+    add(nthWeekday(y,7,1,-1), "Summer bank holiday");
+    add(nthWeekday(y,10,4,4), "Thanksgiving (USA)");
+    add(substitute(new Date(y,11,25), taken), "Christmas Day");
+    add(substitute(new Date(y,11,26), taken), "Boxing Day");
+    return map;
+  }
+
+  // ---- calendar render ----
+  function render() {
+    const skip = document.getElementById("skipHols").checked;
+    const today = midnight(new Date());
+    const todayKey = key(today);
+    const year = today.getFullYear();
+    const yearEnd = new Date(year, 11, 31);
+    const hols = bankHolidays(year);
+
+    const notesLookup = {};
+    entries.forEach(e => { (notesLookup[e.date] = notesLookup[e.date] || {})[e.subject] = e.note; });
+
+    const buckets = {};
+    let total = 0;
+    const cursor = new Date(today);
+    while (cursor <= yearEnd) {
+      const dow = cursor.getDay();
+      if (dow >= 1 && dow <= 5) {
+        const holName = hols[key(cursor)];
+        if (!(skip && holName)) {
+          const m = cursor.getMonth();
+          (buckets[m] = buckets[m] || []).push({ date: new Date(cursor), dow, holName: holName || null });
+          total++;
+        }
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    document.getElementById("count").textContent = total;
+    document.getElementById("countLabel").textContent =
+      (skip ? "working days left until 31 December " : "weekdays left until 31 December ") + year;
+    document.getElementById("todayLine").innerHTML =
+      "Counting from <strong>" + DOW[today.getDay()] + " " + today.getDate() + " " +
+      MONTHS[today.getMonth()] + " " + year + "</strong> &middot; Monday to Friday only" +
+      (skip ? ", public holidays removed" : "");
+
+    const host = document.getElementById("months");
+    host.innerHTML = "";
+    const monthKeys = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+    if (monthKeys.length === 0) {
+      const e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "That's the year done — no working days left.";
+      host.appendChild(e);
+    }
+    monthKeys.forEach(m => {
+      const days = buckets[m];
+      const workCount = days.filter(d => !d.holName).length;
+      const card = document.createElement("section");
+      card.className = "month";
+      const head = document.createElement("div");
+      head.className = "month-head";
+      head.innerHTML =
+        '<span class="month-name">' + MONTHS[m] + '</span>' +
+        '<span class="month-tally"><b>' + workCount + '</b> day' + (workCount === 1 ? "" : "s") + '</span>';
+      card.appendChild(head);
+      const ol = document.createElement("ol");
+      ol.className = "days";
+      days.forEach(d => {
+        const li = document.createElement("li");
+        const isToday = key(d.date) === todayKey;
+        if (isToday) li.classList.add("is-today");
+        if (d.holName) li.classList.add("is-holiday");
+        let top =
+          '<span class="dow">' + DOW[d.dow] + '</span>' +
+          '<span class="dnum">' + d.date.getDate() + '</span>';
+        if (isToday) top += '<span class="today-tag">Today</span>';
+        else if (d.holName) top += '<span class="holiday-tag">' + d.holName + '</span>';
+        li.innerHTML = '<div class="day-top">' + top + '</div>';
+        if (!d.holName) {
+          const notes = notesLookup[isoKey(d.date)] || {};
+          const subs = SUBJECTS.map((s, i) => {
+            const note = notes[s] ? '<span class="snote"> — ' + escHtml(notes[s]) + '</span>' : '';
+            return '<div class="subject"><span class="idx">' + (i + 1) +
+              '</span><span class="sname">' + s + note + '</span></div>';
+          }).join("");
+          li.innerHTML += '<div class="subjects">' + subs + '</div>';
+        }
+        ol.appendChild(li);
+      });
+      card.appendChild(ol);
+      host.appendChild(card);
+    });
+
+    document.getElementById("foot").textContent =
+      "Recalculated live each time this page opens \u00B7 " +
+      (mode === "cloud" ? "notes sync across everyone" : "notes are local to this browser until connected");
+  }
+
+  // ---- editor ----
+  const dateInput = document.getElementById("eDate");
+  const subjectSel = document.getElementById("eSubject");
+  const noteInput = document.getElementById("eNote");
+  const statusEl = document.getElementById("eStatus");
+  const entriesHost = document.getElementById("entriesList");
+  const editorEl = document.getElementById("editor");
+  const editBtn = document.getElementById("editBtn");
+
+  SUBJECTS.forEach(s => {
+    const o = document.createElement("option");
+    o.value = s; o.textContent = s;
+    subjectSel.appendChild(o);
+  });
+  (function setBounds() {
+    const t = midnight(new Date());
+    dateInput.min = isoKey(t);
+    dateInput.max = isoKey(new Date(t.getFullYear(), 11, 31));
+  })();
+
+  function flash(msg, kind) {
+    statusEl.textContent = msg || "";
+    statusEl.className = "status" + (kind ? " " + kind : "");
+  }
+  function fmtIso(iso) {
+    const d = parseIso(iso);
+    return DOW[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+  }
+  function wontShowReason(iso) {
+    const d = parseIso(iso), t = midnight(new Date()), end = new Date(t.getFullYear(), 11, 31);
+    if (d.getDay() === 0 || d.getDay() === 6) return "it falls on a weekend";
+    if (d < t || d > end) return "it's outside the rest of this year";
+    if (bankHolidays(d.getFullYear())[key(d)]) return "it's a public holiday";
+    return null;
+  }
+  function renderEntries() {
+    entries.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.subject < b.subject ? -1 : 1));
+    if (!entries.length) {
+      entriesHost.innerHTML = '<p class="entries-empty">No notes yet.</p>';
+      return;
+    }
+    entriesHost.innerHTML = "";
+    entries.forEach((e, i) => {
+      const row = document.createElement("div");
+      row.className = "entry";
+      row.innerHTML =
+        '<span class="e-date">' + fmtIso(e.date) + '</span>' +
+        '<span class="e-subj">' + escHtml(e.subject) + '</span>' +
+        '<span class="e-note"></span>' +
+        '<button class="e-del" title="Delete" aria-label="Delete note">&times;</button>';
+      row.querySelector(".e-note").textContent = e.note;
+      row.querySelector(".e-del").addEventListener("click", () => {
+        entries.splice(i, 1);
+        renderEntries(); render(); persist();
+        flash("Removed.", "ok");
+      });
+      entriesHost.appendChild(row);
+    });
+  }
+  function addEntry() {
+    const dateVal = dateInput.value, subject = subjectSel.value, note = noteInput.value.trim();
+    if (!dateVal) { flash("Pick a date first.", "warn"); dateInput.focus(); return; }
+    if (!note) { flash("Type a note first.", "warn"); noteInput.focus(); return; }
+    entries = entries.filter(e => !(e.date === dateVal && e.subject === subject));
+    entries.push({ date: dateVal, subject: subject, note: note });
+    noteInput.value = "";
+    renderEntries(); render(); persist();
+    const why = wontShowReason(dateVal);
+    flash(why ? ("Saved, but it won't appear because " + why + ".") : ("Added to " + fmtIso(dateVal) + "."),
+          why ? "warn" : "ok");
+  }
+
+  function setEditing(on) {
+    editing = on;
+    editorEl.hidden = !on;
+    editBtn.textContent = on ? "Done" : "Edit";
+    if (on) renderEntries();
+  }
+  editBtn.addEventListener("click", () => {
+    if (editing) { setEditing(false); return; }
+    if (EDIT_PASSPHRASE) {
+      const tryPass = window.prompt("Enter the edit passphrase:");
+      if (tryPass === null) return;
+      if (tryPass !== EDIT_PASSPHRASE) { window.alert("That passphrase didn't match."); return; }
+    }
+    setEditing(true);
+  });
+  document.getElementById("eAdd").addEventListener("click", addEntry);
+  noteInput.addEventListener("keydown", e => { if (e.key === "Enter") addEntry(); });
+  document.getElementById("skipHols").addEventListener("change", render);
+
+  // ---- sync status ----
+  function setStatus(state) {
+    const pill = document.getElementById("syncPill");
+    const text = document.getElementById("syncText");
+    pill.className = "syncpill";
+    if (state === "synced") { pill.classList.add("is-synced"); text.textContent = "Synced"; }
+    else if (state === "saving") { pill.classList.add("is-saving"); text.textContent = "Saving…"; }
+    else if (state === "error") { pill.classList.add("is-error"); text.textContent = "Connection problem"; }
+    else { pill.classList.add("is-local"); text.textContent = "Local only — not shared"; }
+  }
+  function showBanner(html) {
+    const b = document.getElementById("banner");
+    b.innerHTML = html; b.style.display = "block";
+  }
+
+  // ---- storage ----
+  function normalize(val) {
+    if (Array.isArray(val)) return val.filter(Boolean);
+    if (val && typeof val === "object") return Object.values(val).filter(Boolean);
+    return [];
+  }
+  function persist() {
+    if (mode === "cloud" && fb) {
+      setStatus("saving");
+      fb.set(fb.ref(fb.db, "calendar/entries"), entries)
+        .then(() => setStatus("synced"))
+        .catch(() => setStatus("error"));
+    }
+  }
+  async function initStorage() {
+    const configured = firebaseConfig.apiKey !== "PASTE_API_KEY" &&
+                       firebaseConfig.databaseURL && firebaseConfig.databaseURL.indexOf("PASTE_") === -1;
+    if (!configured) {
+      mode = "local";
+      setStatus("local");
+      showBanner('<b>Not connected yet.</b> The page works, but notes stay in this browser only. ' +
+        'To share them, do the one-time Firebase setup and paste your keys into the <code>firebaseConfig</code> ' +
+        'block near the top of this file.');
+      return;
+    }
+    try {
+      const appMod = await import("https://www.gstatic.com/firebasejs/" + FB_VERSION + "/firebase-app.js");
+      const dbMod  = await import("https://www.gstatic.com/firebasejs/" + FB_VERSION + "/firebase-database.js");
+      const app = appMod.initializeApp(firebaseConfig);
+      const db = dbMod.getDatabase(app);
+      fb = { db, ref: dbMod.ref, set: dbMod.set };
+      mode = "cloud";
+      setStatus("synced");
+      let first = true;
+      dbMod.onValue(dbMod.ref(db, "calendar/entries"), snap => {
+        const val = snap.val();
+        if (first && (val === null || val === undefined)) {
+          first = false;
+          persist();          // seed the database with the starting notes
+          return;
+        }
+        first = false;
+        entries = normalize(val);
+        renderEntries(); render();
+        setStatus("synced");
+      }, () => setStatus("error"));
+    } catch (err) {
+      mode = "local";
+      setStatus("error");
+      showBanner('<b>Couldn\'t reach the storage.</b> Double-check the keys in <code>firebaseConfig</code> ' +
+        'and that Realtime Database is switched on in your Firebase project. The page still works locally for now.');
+    }
+  }
+
+  render();
+  initStorage();
+})();
+</script>
+</body>
+</html>
