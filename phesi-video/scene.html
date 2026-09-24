@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phesi Trial Accelerator</title>
+<style>
+  @font-face { font-family: "InterV"; src: url(__FONT__) format("woff2"); font-weight: 100 900; }
+  :root {
+    --bg: #050F22; --ink: #F3F7FF; --muted: #8FA3C2; --teal: #22D3C5; --blue: #4C9BFF; --pink: #FF4F8B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  body { font-family: "InterV", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  canvas { position: absolute; inset: 0; }
+  .layer { position: absolute; will-change: transform, opacity; opacity: 0; }
+  .eyebrow { font-size: 22px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--teal); }
+  .h1 { font-size: 132px; font-weight: 750; letter-spacing: -.035em; line-height: 1; }
+  .h2 { font-size: 76px; font-weight: 720; letter-spacing: -.03em; line-height: 1.04; }
+  .h3 { font-size: 54px; font-weight: 700; letter-spacing: -.025em; line-height: 1.08; }
+  .sub { font-size: 30px; font-weight: 420; color: var(--muted); line-height: 1.4; }
+  .accent { color: var(--teal); }
+  .pink { color: var(--pink); }
+  .grad { background: linear-gradient(90deg, var(--teal), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* Scene 1 */
+  #s1 { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 1; }
+  #s1 .h1 { margin: 28px 0 34px; }
+  #s1 .rule { width: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--teal), transparent); margin: 0 auto 34px; }
+
+  /* Scene 2 */
+  #s2 { left: 0; top: 0; width: 1920px; height: 1080px; }
+  #mol { position: absolute; left: 190px; top: 250px; width: 620px; height: 580px; }
+  #s2 .copy { position: absolute; left: 960px; top: 300px; width: 820px; }
+  #s2 .h2 { margin: 26px 0 36px; }
+  .chip { display: inline-flex; align-items: center; gap: 18px; padding: 18px 30px; border-radius: 60px; border: 1.5px solid rgba(255,79,139,.55); background: rgba(255,79,139,.1); font-size: 32px; font-weight: 600; }
+  .chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 18px var(--pink); }
+  #s2 .sub { margin-top: 40px; }
+
+  /* Scene 3 */
+  #s3 { left: 150px; top: 330px; width: 760px; }
+  #s3 .h2 { margin: 26px 0 30px; }
+  #card { position: absolute; left: 1020px; top: 170px; width: 760px; transform-origin: 0 0; border-radius: 28px; padding: 40px 44px 30px;
+    background: linear-gradient(160deg, rgba(34,211,197,.10), rgba(76,155,255,.06)); border: 1.5px solid rgba(34,211,197,.35);
+    box-shadow: 0 40px 120px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(8px); background-color: rgba(8,24,52,.86); }
+  #card .head { display: flex; align-items: center; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid rgba(143,163,194,.22); margin-bottom: 14px; }
+  #card .avatar { width: 84px; height: 84px; border-radius: 50%; background: rgba(34,211,197,.14); border: 1.5px solid var(--teal); display: grid; place-items: center; }
+  #card .title { font-size: 34px; font-weight: 700; }
+  #card .tag { font-size: 18px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .crit { display: flex; align-items: center; gap: 22px; padding: 17px 0; font-size: 29px; font-weight: 480; border-bottom: 1px solid rgba(143,163,194,.12); }
+  .crit:last-child { border-bottom: 0; }
+  .crit .ck { width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--teal); }
+  .crit .lbl { color: var(--muted); font-size: 20px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; width: 170px; flex: none; }
+
+  /* Query chip (profile collapsed) */
+  #query { left: 60px; top: 50px; display: flex; align-items: center; gap: 16px; padding: 16px 26px; border-radius: 16px; background: rgba(8,24,52,.9); border: 1.5px solid rgba(34,211,197,.45); font-size: 24px; font-weight: 560; }
+  #query .k { color: var(--muted); font-size: 17px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
+  #query .live { width: 12px; height: 12px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 14px var(--teal); }
+
+  /* Bottom caption band */
+  .cap { left: 120px; top: 862px; width: 1080px; }
+  .cap .h3 { margin: 14px 0 12px; }
+  .cap .sub { font-size: 26px; }
+  .band { position: absolute; left: 0; right: 0; top: 820px; height: 260px; background: linear-gradient(180deg, rgba(5,15,34,0), rgba(5,15,34,.92) 30%, #050F22); opacity: 0; }
+
+  /* Region labels */
+  .region { font-size: 19px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); padding: 8px 14px; border-radius: 8px; background: rgba(5,15,34,.75); border: 1px solid rgba(76,155,255,.4); white-space: nowrap; }
+
+  /* AI panel */
+  #ai { left: 1290px; top: 862px; width: 520px; }
+  #ai .top { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; }
+  #ai .top .live { width: 12px; height: 12px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 14px var(--pink); }
+  .stage { display: flex; align-items: center; gap: 16px; font-size: 24px; font-weight: 520; padding: 7px 0; color: var(--muted); }
+  .stage .b { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(143,163,194,.5); flex: none; display: grid; place-items: center; }
+  .stage.on { color: var(--ink); }
+  .stage.on .b { background: var(--teal); border-color: var(--teal); }
+  .stage.on .b::after { content: '✓'; font-size: 16px; font-weight: 800; color: #050F22; }
+
+  /* Scene 7 */
+  #s7 { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #s7 .line { font-size: 92px; font-weight: 740; letter-spacing: -.035em; line-height: 1.12; opacity: 0; }
+  #benefits { display: flex; gap: 28px; margin-top: 70px; }
+  .ben { width: 470px; text-align: left; padding: 34px 36px; border-radius: 22px; background: rgba(12,32,66,.8); border: 1.5px solid rgba(76,155,255,.28); opacity: 0; }
+  .ben .n { font-size: 20px; font-weight: 700; letter-spacing: .16em; color: var(--teal); }
+  .ben .t { font-size: 32px; font-weight: 700; margin: 12px 0 10px; letter-spacing: -.01em; }
+  .ben .d { font-size: 22px; color: var(--muted); line-height: 1.4; }
+
+  /* End card */
+  #end { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #end .word { font-size: 180px; font-weight: 780; letter-spacing: -.05em; line-height: 1; }
+  #end .prod { font-size: 50px; font-weight: 600; letter-spacing: -.01em; margin-top: 18px; }
+  #end .tag { margin-top: 44px; }
+  #end .url { margin-top: 60px; font-size: 34px; font-weight: 600; letter-spacing: .06em; padding: 18px 40px; border-radius: 60px; border: 1.5px solid rgba(34,211,197,.6); color: var(--teal); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="cv" width="1920" height="1080"></canvas>
+  <div class="band" id="band"></div>
+
+  <!-- 1. Title -->
+  <div class="layer" id="s1">
+    <div class="eyebrow" id="s1e">Phesi</div>
+    <div class="h1" id="s1h">Trial <span class="grad">Accelerator</span></div>
+    <div class="rule" id="s1r"></div>
+    <div class="sub" id="s1s" style="font-size:36px">Precision, from a new drug to the right patient.</div>
+  </div>
+
+  <!-- 2. The drug -->
+  <div class="layer" id="s2">
+    <svg id="mol" viewBox="0 0 620 580" fill="none">
+      <defs>
+        <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3C5"/><stop offset="1" stop-color="#4C9BFF"/></linearGradient>
+        <radialGradient id="glow"><stop offset="0" stop-color="#22D3C5" stop-opacity=".35"/><stop offset="1" stop-color="#22D3C5" stop-opacity="0"/></radialGradient>
+      </defs>
+      <circle cx="310" cy="290" r="280" fill="url(#glow)" id="molglow"/>
+      <g stroke="url(#mg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" id="molpaths"></g>
+      <g id="molatoms"></g>
+    </svg>
+    <div class="copy">
+      <div class="eyebrow">01 · The starting point</div>
+      <div class="h2">A promising new drug.</div>
+      <div class="chip"><span class="dot"></span>Indication: Breast cancer</div>
+      <div class="sub">To prove it works, you need the right patients &mdash; wherever they are in the world.</div>
+    </div>
+  </div>
+
+  <!-- 3. Patient profile -->
+  <div class="layer" id="s3">
+    <div class="eyebrow">02 · Define the profile</div>
+    <div class="h2">Who is the<br>right patient?</div>
+    <div class="sub">Trial Accelerator turns your protocol into a precise patient profile.</div>
+  </div>
+  <div class="layer" id="card">
+    <div class="head">
+      <div class="avatar"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#22D3C5" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
+      <div><div class="title">Target patient profile</div><div class="tag">Breast cancer · example</div></div>
+    </div>
+    <div class="crit"><span class="ck">✓</span><span class="lbl">Diagnosis</span>Metastatic breast cancer</div>
+    <div class="crit"><span class="ck">✓</span><span class="lbl">Biomarker</span>HR+ / HER2&minus;</div>
+    <div class="crit"><span class="ck">✓</span><span class="lbl">Treatment</span>1&ndash;2 prior lines of therapy</div>
+    <div class="crit"><span class="ck">✓</span><span class="lbl">Status</span>ECOG 0&ndash;1</div>
+    <div class="crit"><span class="ck">✓</span><span class="lbl">Disease</span>Measurable (RECIST 1.1)</div>
+  </div>
+  <div class="layer" id="query"><span class="live"></span><span class="k">Profile</span>HR+ / HER2&minus; metastatic breast cancer</div>
+
+  <!-- 4. Global data -->
+  <div class="layer cap" id="c4">
+    <div class="eyebrow">03 · Search the world</div>
+    <div class="h3">The largest source of <span class="accent">global</span> clinical data</div>
+    <div class="sub">Trials, sites, investigators and patient populations from every region, in one platform.</div>
+  </div>
+  <div class="layer region" id="r0">North America</div>
+  <div class="layer region" id="r1">Latin America</div>
+  <div class="layer region" id="r2">Europe</div>
+  <div class="layer region" id="r3">Middle East &amp; Africa</div>
+  <div class="layer region" id="r4">Asia-Pacific</div>
+
+  <!-- 5. AI -->
+  <div class="layer cap" id="c5">
+    <div class="eyebrow">04 · AI in real time</div>
+    <div class="h3">Every record analysed <span class="accent">as it arrives</span></div>
+    <div class="sub">Phesi&rsquo;s AI matches global data against your exact profile, instantly.</div>
+  </div>
+  <div class="layer" id="ai">
+    <div class="top"><span class="live"></span>Phesi AI · live</div>
+    <div class="stage" id="st0"><span class="b"></span>Global patient data</div>
+    <div class="stage" id="st1"><span class="b"></span>Breast cancer</div>
+    <div class="stage" id="st2"><span class="b"></span>HR+ / HER2&minus; metastatic</div>
+    <div class="stage" id="st3"><span class="b"></span>Meets full eligibility</div>
+  </div>
+
+  <!-- 6. KOLs -->
+  <div class="layer cap" id="c6" style="width:1700px">
+    <div class="eyebrow">05 · Connect the right experts</div>
+    <div class="h3">Key opinion leaders, <span class="pink">closest to your patients</span></div>
+    <div class="sub">Find the investigators and sites with access to the right patient populations.</div>
+  </div>
+
+  <!-- 7. Outcome -->
+  <div class="layer" id="s7">
+    <div class="line" id="l0">The right patients.</div>
+    <div class="line" id="l1">The right experts.</div>
+    <div class="line grad" id="l2">Anywhere in the world.</div>
+    <div id="benefits">
+      <div class="ben" id="b0"><div class="n">PRECISION</div><div class="t">Exact patient profiles</div><div class="d">From protocol to the patients who truly fit it.</div></div>
+      <div class="ben" id="b1"><div class="n">SCALE</div><div class="t">Largest global data source</div><div class="d">Every region, one platform.</div></div>
+      <div class="ben" id="b2"><div class="n">SPEED</div><div class="t">AI in real time</div><div class="d">Insight the moment data arrives.</div></div>
+    </div>
+  </div>
+
+  <!-- End card -->
+  <div class="layer" id="end">
+    <div class="word">Phesi</div>
+    <div class="prod">Trial <span class="grad">Accelerator</span></div>
+    <div class="sub tag">Find the right patients, faster.</div>
+    <div class="url">www.phesi.com</div>
+  </div>
+</div>
+
+<script>
+const DOTS = __DOTS__;
+const DURATION = 55;
+const W = 1920, H = 1080, K = 6;
+const proj = (lon, lat) => { if (lon < -135) lon += 360; return [(lon + 135) * K, (84 - lat) * K]; };
+
+// ---------- helpers ----------
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const pr = (t, a, b) => cl((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const lerp = (a, b, x) => a + (b - a) * x;
+const win = (t, a, b, fi = .7, fo = .6) => Math.min(eo(pr(t, a, a + fi)), 1 - eio(pr(t, b - fo, b)));
+const $ = id => document.getElementById(id);
+function show(id, o, dy = 0, sc = 1, dx = 0) {
+  const e = typeof id === 'string' ? $(id) : id;
+  e.style.opacity = o.toFixed(3);
+  e.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sc.toFixed(4)})`;
+}
+function rise(id, t, a, b, fi = .8, fo = .6, dist = 40) {
+  const v = win(t, a, b, fi, fo);
+  const d = (1 - eo(pr(t, a, a + fi))) * dist - eio(pr(t, b - fo, b)) * dist * .4;
+  show(id, v, d);
+}
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- data ----------
+const HUBS = {
+  Boston: [-71.06, 42.36], Houston: [-95.37, 29.76], Toronto: [-79.38, 43.65], 'Mexico City': [-99.13, 19.43],
+  'São Paulo': [-46.63, -23.55], 'Buenos Aires': [-58.38, -34.6], London: [-0.13, 51.5], Paris: [2.35, 48.86],
+  Berlin: [13.4, 52.52], Madrid: [-3.7, 40.42], Warsaw: [21.01, 52.23], Istanbul: [28.98, 41.0], Cairo: [31.24, 30.04],
+  Johannesburg: [28.05, -26.2], Mumbai: [72.88, 19.08], Shanghai: [121.47, 31.23], Beijing: [116.4, 39.9],
+  Seoul: [126.98, 37.57], Tokyo: [139.69, 35.69], Singapore: [103.82, 1.35], Sydney: [151.21, -33.87], Melbourne: [144.96, -37.81]
+};
+const hubPx = Object.entries(HUBS).map(([n, ll]) => ({ n, p: proj(...ll) }));
+const R = rng(7);
+const dots = DOTS.map(([x, y]) => {
+  let md = 1e9; for (const h of hubPx) md = Math.min(md, Math.hypot(h.p[0] - x, h.p[1] - y));
+  const r = R();
+  const prob = md < 60 ? .7 : md < 120 ? .28 : .035;
+  return { x, y, m: r < prob, tw: R() * 6.283, d: x / W * 2.6 + R() * .35 };
+});
+const KOLS = ['Boston', 'Houston', 'São Paulo', 'London', 'Istanbul', 'Johannesburg', 'Mumbai', 'Shanghai', 'Tokyo', 'Sydney']
+  .map((n, i) => {
+    const p = proj(...HUBS[n]);
+    const near = dots.filter(d => d.m).map(d => ({ d, r: Math.hypot(d.x - p[0], d.y - p[1]) }))
+      .filter(o => o.r < 170).sort((a, b) => a.r - b.r).slice(0, 9).map(o => o.d);
+    return { n, p, near, t0: 37.2 + i * .34, below: n === 'Shanghai' || n === 'Johannesburg' };
+  });
+const REGIONS = [['r0', -100, 56], ['r1', -64, -6], ['r2', 12, 64], ['r3', 22, 6], ['r4', 112, 56]];
+
+// Molecule (scene 2): benzene-style rings + bonds
+const molG = $('molpaths'), molA = $('molatoms');
+const hex = (cx, cy, r) => Array.from({ length: 6 }, (_, i) => [cx + r * Math.cos(Math.PI / 6 + i * Math.PI / 3), cy + r * Math.sin(Math.PI / 6 + i * Math.PI / 3)]);
+const ring1 = hex(230, 300, 90), ring2 = hex(386, 210, 90);
+const molSegs = [];
+const addPoly = pts => molSegs.push('M' + pts.map(p => p.map(v => v.toFixed(1)).join(' ')).join('L') + 'Z');
+addPoly(ring1); addPoly(ring2);
+molSegs.push(`M${ring1[5][0]} ${ring1[5][1]}L${ring2[2][0]} ${ring2[2][1]}`);
+molSegs.push(`M${ring1[2][0]} ${ring1[2][1]}L${ring1[2][0] - 70} ${ring1[2][1] + 60}`);
+molSegs.push(`M${ring1[1][0]} ${ring1[1][1]}L${ring1[1][0]} ${ring1[1][1] + 100}`);
+molSegs.push(`M${ring2[0][0]} ${ring2[0][1]}L${ring2[0][0] + 90} ${ring2[0][1] + 40}`);
+molSegs.push(`M${ring2[4][0]} ${ring2[4][1]}L${ring2[4][0]} ${ring2[4][1] - 100}`);
+molSegs.push(`M${ring2[5][0]} ${ring2[5][1]}L${ring2[5][0] + 85} ${ring2[5][1] - 50}`);
+const molEls = molSegs.map(d => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); molG.appendChild(p); return p; });
+molEls.forEach(p => { const L = p.getTotalLength(); p.dataset.L = L; p.style.strokeDasharray = L; });
+const atoms = [[ring1[2][0] - 70, ring1[2][1] + 60, '#FF4F8B'], [ring1[1][0], ring1[1][1] + 100, '#22D3C5'], [ring2[0][0] + 90, ring2[0][1] + 40, '#4C9BFF'],
+  [ring2[4][0], ring2[4][1] - 100, '#FF4F8B'], [ring2[5][0] + 85, ring2[5][1] - 50, '#22D3C5']];
+const atomEls = atoms.map(([x, y, c]) => { const e = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); e.setAttribute('cx', x); e.setAttribute('cy', y); e.setAttribute('r', 20); e.setAttribute('fill', c); molA.appendChild(e); return e; });
+
+const cv = $('cv'), cx = cv.getContext('2d');
+const crits = [...document.querySelectorAll('.crit')];
+const stages = [0, 1, 2, 3].map(i => $('st' + i));
+
+// ---------- frame ----------
+function render(t) {
+  // background
+  const g = cx.createRadialGradient(960, 430, 100, 960, 540, 1250);
+  g.addColorStop(0, '#0B2144'); g.addColorStop(1, '#040C1C');
+  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+
+  // ---- map ----
+  const mapFade = 1 - eio(pr(t, 44, 45.2)) * .88 - eio(pr(t, 49.4, 50.4)) * .12;
+  const preview = .07 * (1 - eio(pr(t, 5.3, 6.2)) * .6);   // faint map behind scenes 1–3
+  const drift = t < 19 ? Math.sin(t * .25) * 6 : 0;
+  const beamX = lerp(-150, 2070, eio(pr(t, 28.7, 33.2)));
+  const aiOn = t > 28.5;
+  const kolDim = eio(pr(t, 36.6, 37.4));
+
+  for (const d of dots) {
+    const a = pr(t, 19.6 + d.d, 20.1 + d.d);
+    const appear = eo(a);
+    const flash = a > 0 && a < 1 ? Math.sin(a * Math.PI) : 0;
+    const tw = .82 + .18 * Math.sin(t * 2.2 + d.tw);
+    let alpha = preview + appear * .55 * tw;
+    let r = 2.4 + flash * 3.2;
+    let col = '76,155,255';
+    if (aiOn && d.x < beamX) {
+      const k = cl((beamX - d.x) / 160);
+      if (d.m) { col = '255,79,139'; alpha = lerp(alpha, .95 * tw, k); r = lerp(r, 3.3, k); }
+      else alpha = lerp(alpha, .1, k);
+    }
+    if (d.m && kolDim > 0) alpha = lerp(alpha, .45 + .25 * tw, kolDim);
+    alpha *= mapFade;
+    if (alpha < .01) continue;
+    cx.fillStyle = `rgba(${col},${alpha.toFixed(3)})`;
+    cx.beginPath(); cx.arc(d.x + drift, d.y, r, 0, 6.283); cx.fill();
+    if (flash > .2) { cx.fillStyle = `rgba(34,211,197,${(flash * .25).toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, r * 2.6, 0, 6.283); cx.fill(); }
+  }
+
+  // AI scan beam
+  if (t > 28.6 && t < 33.4) {
+    const bg = cx.createLinearGradient(beamX - 220, 0, beamX + 8, 0);
+    bg.addColorStop(0, 'rgba(34,211,197,0)'); bg.addColorStop(.92, 'rgba(34,211,197,.16)'); bg.addColorStop(1, 'rgba(34,211,197,.0)');
+    cx.fillStyle = bg; cx.fillRect(beamX - 220, 0, 228, 860);
+    cx.fillStyle = 'rgba(160,255,245,.95)'; cx.fillRect(beamX - 1.5, 0, 3, 860);
+    cx.shadowColor = '#22D3C5'; cx.shadowBlur = 30; cx.fillRect(beamX - 1, 0, 2, 860); cx.shadowBlur = 0;
+  }
+
+  // KOL network
+  if (t > 36.8 && t < 50.5) {
+    const kf = mapFade;
+    // arcs between KOLs
+    for (let i = 0; i < KOLS.length - 1; i++) {
+      const A = KOLS[i], B = KOLS[i + 1];
+      const q = eio(pr(t, B.t0, B.t0 + 1.1));
+      if (q <= 0) continue;
+      const mx = (A.p[0] + B.p[0]) / 2, my = Math.min(A.p[1], B.p[1]) - Math.hypot(B.p[0] - A.p[0], B.p[1] - A.p[1]) * .28;
+      cx.strokeStyle = `rgba(34,211,197,${(.5 * kf).toFixed(3)})`; cx.lineWidth = 2; cx.setLineDash([]);
+      cx.beginPath();
+      for (let s = 0; s <= 40 * q; s++) {
+        const u = s / 40, x = (1 - u) * (1 - u) * A.p[0] + 2 * (1 - u) * u * mx + u * u * B.p[0], y = (1 - u) * (1 - u) * A.p[1] + 2 * (1 - u) * u * my + u * u * B.p[1];
+        s ? cx.lineTo(x, y) : cx.moveTo(x, y);
+      }
+      cx.stroke();
+    }
+    cx.font = '600 19px InterV'; cx.textAlign = 'center';
+    for (const k of KOLS) {
+      const q = eo(pr(t, k.t0, k.t0 + .7));
+      if (q <= 0) continue;
+      // links to nearby matched patients
+      k.near.forEach((d, j) => {
+        const u = eo(pr(t, k.t0 + .25 + j * .06, k.t0 + .75 + j * .06));
+        if (u <= 0) return;
+        cx.strokeStyle = `rgba(255,79,139,${(.55 * kf).toFixed(3)})`; cx.lineWidth = 1.5;
+        cx.beginPath(); cx.moveTo(k.p[0], k.p[1]); cx.lineTo(lerp(k.p[0], d.x, u), lerp(k.p[1], d.y, u)); cx.stroke();
+        cx.fillStyle = `rgba(255,79,139,${kf.toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, 3.8 * u, 0, 6.283); cx.fill();
+      });
+      const pulse = ((t - k.t0) % 2) / 2;
+      cx.strokeStyle = `rgba(34,211,197,${((1 - pulse) * .6 * q * kf).toFixed(3)})`; cx.lineWidth = 2;
+      cx.beginPath(); cx.arc(k.p[0], k.p[1], 14 + pulse * 34, 0, 6.283); cx.stroke();
+      cx.fillStyle = `rgba(5,15,34,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 15 * q, 0, 6.283); cx.fill();
+      cx.strokeStyle = `rgba(34,211,197,${kf})`; cx.lineWidth = 3; cx.stroke();
+      cx.fillStyle = `rgba(34,211,197,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 6 * q, 0, 6.283); cx.fill();
+      const lq = eo(pr(t, k.t0 + .3, k.t0 + .9)) * kf;
+      if (lq > 0) {
+        const label = 'KOL · ' + k.n, tw2 = cx.measureText(label).width + 22, ly = k.p[1] + (k.below ? 46 : -44) + (1 - lq) * 8;
+        cx.fillStyle = `rgba(5,15,34,${(.85 * lq).toFixed(3)})`; cx.strokeStyle = `rgba(34,211,197,${(.5 * lq).toFixed(3)})`; cx.lineWidth = 1;
+        cx.beginPath(); cx.roundRect(k.p[0] - tw2 / 2, ly - 17, tw2, 32, 7); cx.fill(); cx.stroke();
+        cx.fillStyle = `rgba(243,247,255,${lq.toFixed(3)})`; cx.fillText(label, k.p[0], ly + 6);
+      }
+    }
+  }
+
+  // ---------- DOM layers ----------
+  // Scene 1 title
+  const s1 = win(t, 0, 5.4, .01, .7);
+  $('s1').style.opacity = s1;
+  rise('s1e', t, .3, 99, .9); rise('s1h', t, .6, 99, 1.1, .6, 60); rise('s1s', t, 1.6, 99, 1);
+  $('s1r').style.width = (eio(pr(t, 1.2, 2.4)) * 520) + 'px';
+  $('s1').style.transform = `scale(${(1 + t * .006).toFixed(4)})`;
+
+  // Scene 2 drug
+  $('s2').style.opacity = win(t, 5.5, 11.6, .6, .6);
+  molEls.forEach((p, i) => { const q = eio(pr(t, 5.8 + i * .28, 7.2 + i * .28)); p.style.strokeDashoffset = (+p.dataset.L * (1 - q)).toFixed(1); });
+  atomEls.forEach((e, i) => { const q = eo(pr(t, 7.4 + i * .15, 7.9 + i * .15)); e.setAttribute('r', (20 * q + Math.sin(t * 2 + i) * 1.5 * q).toFixed(2)); });
+  $('mol').style.transform = `rotate(${(Math.sin(t * .4) * 4).toFixed(2)}deg) scale(${(1 + .02 * Math.sin(t)).toFixed(4)})`;
+  $('molglow').setAttribute('opacity', (.7 + .3 * Math.sin(t * 1.6)).toFixed(3));
+  const copy = document.querySelectorAll('#s2 .copy > *');
+  copy.forEach((e, i) => rise(e, t, 6.2 + i * .45, 99, .8));
+
+  // Scene 3 profile
+  rise('s3', t, 11.8, 19.2, .8, .6);
+  const cardIn = eo(pr(t, 12.1, 13.0));
+  const toChip = eio(pr(t, 19.0, 20.0));
+  const card = $('card');
+  card.style.opacity = (cardIn * (1 - toChip)).toFixed(3);
+  card.style.transform = `translate(${lerp(60 * (1 - cardIn), -960, toChip).toFixed(1)}px, ${lerp(0, -120, toChip).toFixed(1)}px) scale(${lerp(1, .4, toChip).toFixed(4)})`;
+  crits.forEach((c, i) => {
+    const q = eo(pr(t, 13.1 + i * .6, 13.7 + i * .6));
+    c.style.opacity = (.15 + .85 * q).toFixed(3);
+    c.querySelector('.ck').style.transform = `scale(${q.toFixed(3)})`;
+    c.style.transform = `translateX(${((1 - q) * 20).toFixed(1)}px)`;
+  });
+  const qv = eo(pr(t, 19.7, 20.4)) * (1 - eio(pr(t, 43.6, 44.3)));
+  show('query', qv, (1 - qv) * -10);
+  $('query').querySelector('.live').style.opacity = (.55 + .45 * Math.sin(t * 5)).toFixed(3);
+
+  // Band + captions over the map
+  $('band').style.opacity = win(t, 19.4, 44.2, .8, .6);
+  rise('c4', t, 20.3, 28.4, .8, .5);
+  REGIONS.forEach(([id, lon, lat], i) => {
+    const [x, y] = proj(lon, lat); const e = $(id);
+    const v = win(t, 21.0 + i * .5, 28.3, .5, .4);
+    e.style.left = x + 'px'; e.style.top = y + 'px';
+    e.style.opacity = v.toFixed(3); e.style.transform = `translate(-50%, ${((1 - v) * 12 - 50).toFixed(1)}%)`;
+  });
+  rise('c5', t, 28.7, 36.6, .8, .5);
+  rise('ai', t, 29.0, 36.6, .8, .5);
+  stages.forEach((s, i) => s.classList.toggle('on', t > 29.6 + i * 1.05));
+  rise('c6', t, 37.0, 44.2, .8, .5);
+
+  // Scene 7 outcome
+  $('s7').style.opacity = win(t, 44.2, 50.6, .3, .7);
+  ['l0', 'l1', 'l2'].forEach((id, i) => rise(id, t, 44.5 + i * .55, 99, .8, .6, 50));
+  ['b0', 'b1', 'b2'].forEach((id, i) => rise(id, t, 46.4 + i * .3, 99, .8, .6, 40));
+
+  // End card
+  $('end').style.opacity = win(t, 50.6, 99, .9);
+  const ends = document.querySelectorAll('#end > *');
+  ends.forEach((e, i) => rise(e, t, 50.8 + i * .35, 99, .9, .6, 40));
+  $('end').style.transform = `scale(${(1 + pr(t, 50.6, 55) * .025).toFixed(4)})`;
+}
+
+window.render = render;
+window.DURATION = DURATION;
+window.ready = document.fonts.ready;
+if (!location.search.includes('capture')) {
+  document.fonts.ready.then(() => { const t0 = performance.now(); const loop = () => { render(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body>
+</html>
