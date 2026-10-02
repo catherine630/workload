@@ -23,10 +23,6 @@
   .pink { color: var(--pink); }
   .grad { background: linear-gradient(90deg, var(--teal), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-  /* Query chip (profile collapsed) */
-  #query { left: 60px; top: 50px; display: flex; align-items: center; gap: 16px; padding: 16px 26px; border-radius: 16px; background: rgba(8,24,52,.9); border: 1.5px solid rgba(34,211,197,.45); font-size: 24px; font-weight: 560; }
-  #query .k { color: var(--muted); font-size: 17px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
-  #query .live { width: 12px; height: 12px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 14px var(--teal); }
 
   /* Bottom caption band */
   .cap { left: 120px; top: 862px; width: 1080px; }
@@ -70,7 +66,6 @@
   <canvas id="cv" width="1920" height="1080"></canvas>
   <div class="band" id="band"></div>
 
-  <div class="layer" id="query"><span class="live"></span><span class="k">Profile</span>HR+ / HER2&minus; metastatic breast cancer</div>
 
   <!-- 4. Global data -->
   <div class="layer cap" id="c4" style="width:1700px">
@@ -110,7 +105,7 @@
     <div id="benefits">
       <div class="ben" id="b0"><div class="n">PRECISION</div><div class="t">Exact patient profiles</div><div class="d">From protocol to the patients who truly fit it.</div></div>
       <div class="ben" id="b1"><div class="n">SCALE</div><div class="t">Largest global data source</div><div class="d">Every region, one platform.</div></div>
-      <div class="ben" id="b2"><div class="n">SPEED</div><div class="t">Precise patient data in real-time</div><div class="d">Insight the moment data arrives.</div></div>
+      <div class="ben" id="b2"><div class="n">SPEED</div><div class="t">Precise patient data in real-time</div><div class="d">Dynamic data insights</div></div>
     </div>
   </div>
 
@@ -273,9 +268,6 @@ function render(vt) {
   if (fadeIn > 0) { cx.fillStyle = `rgba(4,12,28,${fadeIn.toFixed(3)})`; cx.fillRect(0, 0, W, H); }
 
   // ---------- DOM layers ----------
-  const qv = eo(pr(t, 19.7, 20.4)) * (1 - eio(pr(t, 43.6, 44.3)));
-  show('query', qv, (1 - qv) * -10);
-  $('query').querySelector('.live').style.opacity = (.55 + .45 * Math.sin(t * 5)).toFixed(3);
 
   // Band + captions over the map
   $('band').style.opacity = win(t, 19.4, 44.2, .8, .6);
