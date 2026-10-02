@@ -61,6 +61,7 @@
   #end .word { font-size: 180px; font-weight: 780; letter-spacing: -.05em; line-height: 1; }
   #end .prod { font-size: 50px; font-weight: 600; letter-spacing: -.01em; margin-top: 18px; }
   #end .tag { margin-top: 44px; }
+  #end .tm { font-size: 24px; font-weight: 600; vertical-align: super; margin-left: 4px; color: var(--blue); }
   #end .url { margin-top: 60px; font-size: 34px; font-weight: 600; letter-spacing: .06em; padding: 18px 40px; border-radius: 60px; border: 1.5px solid rgba(34,211,197,.6); color: var(--teal); }
 </style>
 </head>
@@ -85,22 +86,19 @@
 
   <!-- 5. AI -->
   <div class="layer cap" id="c5">
-    <div class="eyebrow">02 · AI in real time</div>
+    <div class="eyebrow">02 · Precise patient data in real-time</div>
     <div class="h3">Every record analysed <span class="accent">as it arrives</span></div>
-    <div class="sub">Phesi&rsquo;s AI matches global data against your exact profile, instantly.</div>
+    <div class="sub">Phesi&rsquo;s platform matches global data against your exact patient profile, instantly.</div>
   </div>
   <div class="layer" id="ai">
     <div class="top"><span class="live"></span>Phesi AI · live</div>
     <div class="stage" id="st0"><span class="b"></span>Global patient data</div>
-    <div class="stage" id="st1"><span class="b"></span>Breast cancer</div>
-    <div class="stage" id="st2"><span class="b"></span>HR+ / HER2&minus; metastatic</div>
-    <div class="stage" id="st3"><span class="b"></span>Meets full eligibility</div>
   </div>
 
   <!-- 6. KOLs -->
   <div class="layer cap" id="c6" style="width:1700px">
-    <div class="eyebrow">03 · Connect the right experts</div>
-    <div class="h3">Key opinion leaders, <span class="pink">closest to your patients</span></div>
+    <div class="eyebrow">03 · Target the right experts</div>
+    <div class="h3">Key opinion leaders, <span class="pink">relevant to your protocol</span></div>
     <div class="sub">Find the investigators and sites with access to the right patient populations.</div>
   </div>
 
@@ -112,14 +110,14 @@
     <div id="benefits">
       <div class="ben" id="b0"><div class="n">PRECISION</div><div class="t">Exact patient profiles</div><div class="d">From protocol to the patients who truly fit it.</div></div>
       <div class="ben" id="b1"><div class="n">SCALE</div><div class="t">Largest global data source</div><div class="d">Every region, one platform.</div></div>
-      <div class="ben" id="b2"><div class="n">SPEED</div><div class="t">AI in real time</div><div class="d">Insight the moment data arrives.</div></div>
+      <div class="ben" id="b2"><div class="n">SPEED</div><div class="t">Precise patient data in real-time</div><div class="d">Insight the moment data arrives.</div></div>
     </div>
   </div>
 
   <!-- End card -->
   <div class="layer" id="end">
     <div class="word">Phesi</div>
-    <div class="prod">Trial <span class="grad">Accelerator</span></div>
+    <div class="prod">Trial <span class="grad">Accelerator</span><sup class="tm">&trade;</sup></div>
     <div class="sub tag">Find the right patients, faster.</div>
     <div class="url">www.phesi.com</div>
   </div>
@@ -178,7 +176,7 @@ const KOLS = ['Boston', 'Houston', 'São Paulo', 'London', 'Istanbul', 'Johannes
 const REGIONS = [['r0', -100, 56], ['r1', -64, -6], ['r2', 12, 64], ['r3', 22, 6], ['r4', 112, 56]];
 
 const cv = $('cv'), cx = cv.getContext('2d');
-const stages = [0, 1, 2, 3].map(i => $('st' + i));
+const stages = [$('st0')];
 
 // ---------- frame ----------
 function render(vt) {
