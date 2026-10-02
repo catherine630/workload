@@ -23,35 +23,6 @@
   .pink { color: var(--pink); }
   .grad { background: linear-gradient(90deg, var(--teal), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-  /* Scene 1 */
-  #s1 { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 1; }
-  #s1 .h1 { margin: 28px 0 34px; }
-  #s1 .rule { width: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--teal), transparent); margin: 0 auto 34px; }
-
-  /* Scene 2 */
-  #s2 { left: 0; top: 0; width: 1920px; height: 1080px; }
-  #mol { position: absolute; left: 190px; top: 250px; width: 620px; height: 580px; }
-  #s2 .copy { position: absolute; left: 960px; top: 300px; width: 820px; }
-  #s2 .h2 { margin: 26px 0 36px; }
-  .chip { display: inline-flex; align-items: center; gap: 18px; padding: 18px 30px; border-radius: 60px; border: 1.5px solid rgba(255,79,139,.55); background: rgba(255,79,139,.1); font-size: 32px; font-weight: 600; }
-  .chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 18px var(--pink); }
-  #s2 .sub { margin-top: 40px; }
-
-  /* Scene 3 */
-  #s3 { left: 150px; top: 330px; width: 760px; }
-  #s3 .h2 { margin: 26px 0 30px; }
-  #card { position: absolute; left: 1020px; top: 170px; width: 760px; transform-origin: 0 0; border-radius: 28px; padding: 40px 44px 30px;
-    background: linear-gradient(160deg, rgba(34,211,197,.10), rgba(76,155,255,.06)); border: 1.5px solid rgba(34,211,197,.35);
-    box-shadow: 0 40px 120px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter: blur(8px); background-color: rgba(8,24,52,.86); }
-  #card .head { display: flex; align-items: center; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid rgba(143,163,194,.22); margin-bottom: 14px; }
-  #card .avatar { width: 84px; height: 84px; border-radius: 50%; background: rgba(34,211,197,.14); border: 1.5px solid var(--teal); display: grid; place-items: center; }
-  #card .title { font-size: 34px; font-weight: 700; }
-  #card .tag { font-size: 18px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
-  .crit { display: flex; align-items: center; gap: 22px; padding: 17px 0; font-size: 29px; font-weight: 480; border-bottom: 1px solid rgba(143,163,194,.12); }
-  .crit:last-child { border-bottom: 0; }
-  .crit .ck { width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--teal); }
-  .crit .lbl { color: var(--muted); font-size: 20px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; width: 170px; flex: none; }
-
   /* Query chip (profile collapsed) */
   #query { left: 60px; top: 50px; display: flex; align-items: center; gap: 16px; padding: 16px 26px; border-radius: 16px; background: rgba(8,24,52,.9); border: 1.5px solid rgba(34,211,197,.45); font-size: 24px; font-weight: 560; }
   #query .k { color: var(--muted); font-size: 17px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
@@ -98,55 +69,11 @@
   <canvas id="cv" width="1920" height="1080"></canvas>
   <div class="band" id="band"></div>
 
-  <!-- 1. Title -->
-  <div class="layer" id="s1">
-    <div class="eyebrow" id="s1e">Phesi</div>
-    <div class="h1" id="s1h">Trial <span class="grad">Accelerator</span></div>
-    <div class="rule" id="s1r"></div>
-    <div class="sub" id="s1s" style="font-size:36px">Precision, from a new drug to the right patient.</div>
-  </div>
-
-  <!-- 2. The drug -->
-  <div class="layer" id="s2">
-    <svg id="mol" viewBox="0 0 620 580" fill="none">
-      <defs>
-        <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3C5"/><stop offset="1" stop-color="#4C9BFF"/></linearGradient>
-        <radialGradient id="glow"><stop offset="0" stop-color="#22D3C5" stop-opacity=".35"/><stop offset="1" stop-color="#22D3C5" stop-opacity="0"/></radialGradient>
-      </defs>
-      <circle cx="310" cy="290" r="280" fill="url(#glow)" id="molglow"/>
-      <g stroke="url(#mg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" id="molpaths"></g>
-      <g id="molatoms"></g>
-    </svg>
-    <div class="copy">
-      <div class="eyebrow">01 · The starting point</div>
-      <div class="h2">A promising new drug.</div>
-      <div class="chip"><span class="dot"></span>Indication: Breast cancer</div>
-      <div class="sub">To prove it works, you need the right patients &mdash; wherever they are in the world.</div>
-    </div>
-  </div>
-
-  <!-- 3. Patient profile -->
-  <div class="layer" id="s3">
-    <div class="eyebrow">02 · Define the profile</div>
-    <div class="h2">Who is the<br>right patient?</div>
-    <div class="sub">Trial Accelerator turns your protocol into a precise patient profile.</div>
-  </div>
-  <div class="layer" id="card">
-    <div class="head">
-      <div class="avatar"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#22D3C5" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
-      <div><div class="title">Target patient profile</div><div class="tag">Breast cancer · example</div></div>
-    </div>
-    <div class="crit"><span class="ck">✓</span><span class="lbl">Diagnosis</span>Metastatic breast cancer</div>
-    <div class="crit"><span class="ck">✓</span><span class="lbl">Biomarker</span>HR+ / HER2&minus;</div>
-    <div class="crit"><span class="ck">✓</span><span class="lbl">Treatment</span>1&ndash;2 prior lines of therapy</div>
-    <div class="crit"><span class="ck">✓</span><span class="lbl">Status</span>ECOG 0&ndash;1</div>
-    <div class="crit"><span class="ck">✓</span><span class="lbl">Disease</span>Measurable (RECIST 1.1)</div>
-  </div>
   <div class="layer" id="query"><span class="live"></span><span class="k">Profile</span>HR+ / HER2&minus; metastatic breast cancer</div>
 
   <!-- 4. Global data -->
   <div class="layer cap" id="c4" style="width:1700px">
-    <div class="eyebrow">03 · Search the world</div>
+    <div class="eyebrow">01 · Search the world</div>
     <div class="h3">The largest source of <span class="accent">global</span> clinical data</div>
     <div class="sub">Patient, protocol, country, and investigator site feasibility insights from every region, in one platform.</div>
   </div>
@@ -158,7 +85,7 @@
 
   <!-- 5. AI -->
   <div class="layer cap" id="c5">
-    <div class="eyebrow">04 · AI in real time</div>
+    <div class="eyebrow">02 · AI in real time</div>
     <div class="h3">Every record analysed <span class="accent">as it arrives</span></div>
     <div class="sub">Phesi&rsquo;s AI matches global data against your exact profile, instantly.</div>
   </div>
@@ -172,7 +99,7 @@
 
   <!-- 6. KOLs -->
   <div class="layer cap" id="c6" style="width:1700px">
-    <div class="eyebrow">05 · Connect the right experts</div>
+    <div class="eyebrow">03 · Connect the right experts</div>
     <div class="h3">Key opinion leaders, <span class="pink">closest to your patients</span></div>
     <div class="sub">Find the investigators and sites with access to the right patient populations.</div>
   </div>
@@ -200,7 +127,8 @@
 
 <script>
 const DOTS = __DOTS__;
-const DURATION = 55;
+const OFFSET = 19.5;              // scenes 1–3 removed; video starts at the map
+const DURATION = 55 - OFFSET;
 const W = 1920, H = 1080, K = 6;
 const proj = (lon, lat) => { if (lon < -135) lon += 360; return [(lon + 135) * K, (84 - lat) * K]; };
 
@@ -249,31 +177,12 @@ const KOLS = ['Boston', 'Houston', 'São Paulo', 'London', 'Istanbul', 'Johannes
   });
 const REGIONS = [['r0', -100, 56], ['r1', -64, -6], ['r2', 12, 64], ['r3', 22, 6], ['r4', 112, 56]];
 
-// Molecule (scene 2): benzene-style rings + bonds
-const molG = $('molpaths'), molA = $('molatoms');
-const hex = (cx, cy, r) => Array.from({ length: 6 }, (_, i) => [cx + r * Math.cos(Math.PI / 6 + i * Math.PI / 3), cy + r * Math.sin(Math.PI / 6 + i * Math.PI / 3)]);
-const ring1 = hex(230, 300, 90), ring2 = hex(386, 210, 90);
-const molSegs = [];
-const addPoly = pts => molSegs.push('M' + pts.map(p => p.map(v => v.toFixed(1)).join(' ')).join('L') + 'Z');
-addPoly(ring1); addPoly(ring2);
-molSegs.push(`M${ring1[5][0]} ${ring1[5][1]}L${ring2[2][0]} ${ring2[2][1]}`);
-molSegs.push(`M${ring1[2][0]} ${ring1[2][1]}L${ring1[2][0] - 70} ${ring1[2][1] + 60}`);
-molSegs.push(`M${ring1[1][0]} ${ring1[1][1]}L${ring1[1][0]} ${ring1[1][1] + 100}`);
-molSegs.push(`M${ring2[0][0]} ${ring2[0][1]}L${ring2[0][0] + 90} ${ring2[0][1] + 40}`);
-molSegs.push(`M${ring2[4][0]} ${ring2[4][1]}L${ring2[4][0]} ${ring2[4][1] - 100}`);
-molSegs.push(`M${ring2[5][0]} ${ring2[5][1]}L${ring2[5][0] + 85} ${ring2[5][1] - 50}`);
-const molEls = molSegs.map(d => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); molG.appendChild(p); return p; });
-molEls.forEach(p => { const L = p.getTotalLength(); p.dataset.L = L; p.style.strokeDasharray = L; });
-const atoms = [[ring1[2][0] - 70, ring1[2][1] + 60, '#FF4F8B'], [ring1[1][0], ring1[1][1] + 100, '#22D3C5'], [ring2[0][0] + 90, ring2[0][1] + 40, '#4C9BFF'],
-  [ring2[4][0], ring2[4][1] - 100, '#FF4F8B'], [ring2[5][0] + 85, ring2[5][1] - 50, '#22D3C5']];
-const atomEls = atoms.map(([x, y, c]) => { const e = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); e.setAttribute('cx', x); e.setAttribute('cy', y); e.setAttribute('r', 20); e.setAttribute('fill', c); molA.appendChild(e); return e; });
-
 const cv = $('cv'), cx = cv.getContext('2d');
-const crits = [...document.querySelectorAll('.crit')];
 const stages = [0, 1, 2, 3].map(i => $('st' + i));
 
 // ---------- frame ----------
-function render(t) {
+function render(vt) {
+  const t = vt + OFFSET;
   // background
   const g = cx.createRadialGradient(960, 430, 100, 960, 540, 1250);
   g.addColorStop(0, '#0B2144'); g.addColorStop(1, '#040C1C');
@@ -281,8 +190,8 @@ function render(t) {
 
   // ---- map ----
   const mapFade = 1 - eio(pr(t, 44, 45.2)) * .88 - eio(pr(t, 49.4, 50.4)) * .12;
-  const preview = .07 * (1 - eio(pr(t, 5.3, 6.2)) * .6);   // faint map behind scenes 1–3
-  const drift = t < 19 ? Math.sin(t * .25) * 6 : 0;
+  const preview = .028;
+  const drift = 0;
   const beamX = lerp(-150, 2070, eio(pr(t, 28.7, 33.2)));
   const aiOn = t > 28.5;
   const kolDim = eio(pr(t, 36.6, 37.4));
@@ -362,36 +271,10 @@ function render(t) {
     }
   }
 
+  const fadeIn = 1 - eo(pr(vt, 0, .8));
+  if (fadeIn > 0) { cx.fillStyle = `rgba(4,12,28,${fadeIn.toFixed(3)})`; cx.fillRect(0, 0, W, H); }
+
   // ---------- DOM layers ----------
-  // Scene 1 title
-  const s1 = win(t, 0, 5.4, .01, .7);
-  $('s1').style.opacity = s1;
-  rise('s1e', t, .3, 99, .9); rise('s1h', t, .6, 99, 1.1, .6, 60); rise('s1s', t, 1.6, 99, 1);
-  $('s1r').style.width = (eio(pr(t, 1.2, 2.4)) * 520) + 'px';
-  $('s1').style.transform = `scale(${(1 + t * .006).toFixed(4)})`;
-
-  // Scene 2 drug
-  $('s2').style.opacity = win(t, 5.5, 11.6, .6, .6);
-  molEls.forEach((p, i) => { const q = eio(pr(t, 5.8 + i * .28, 7.2 + i * .28)); p.style.strokeDashoffset = (+p.dataset.L * (1 - q)).toFixed(1); });
-  atomEls.forEach((e, i) => { const q = eo(pr(t, 7.4 + i * .15, 7.9 + i * .15)); e.setAttribute('r', (20 * q + Math.sin(t * 2 + i) * 1.5 * q).toFixed(2)); });
-  $('mol').style.transform = `rotate(${(Math.sin(t * .4) * 4).toFixed(2)}deg) scale(${(1 + .02 * Math.sin(t)).toFixed(4)})`;
-  $('molglow').setAttribute('opacity', (.7 + .3 * Math.sin(t * 1.6)).toFixed(3));
-  const copy = document.querySelectorAll('#s2 .copy > *');
-  copy.forEach((e, i) => rise(e, t, 6.2 + i * .45, 99, .8));
-
-  // Scene 3 profile
-  rise('s3', t, 11.8, 19.2, .8, .6);
-  const cardIn = eo(pr(t, 12.1, 13.0));
-  const toChip = eio(pr(t, 19.0, 20.0));
-  const card = $('card');
-  card.style.opacity = (cardIn * (1 - toChip)).toFixed(3);
-  card.style.transform = `translate(${lerp(60 * (1 - cardIn), -960, toChip).toFixed(1)}px, ${lerp(0, -120, toChip).toFixed(1)}px) scale(${lerp(1, .4, toChip).toFixed(4)})`;
-  crits.forEach((c, i) => {
-    const q = eo(pr(t, 13.1 + i * .6, 13.7 + i * .6));
-    c.style.opacity = (.15 + .85 * q).toFixed(3);
-    c.querySelector('.ck').style.transform = `scale(${q.toFixed(3)})`;
-    c.style.transform = `translateX(${((1 - q) * 20).toFixed(1)}px)`;
-  });
   const qv = eo(pr(t, 19.7, 20.4)) * (1 - eio(pr(t, 43.6, 44.3)));
   show('query', qv, (1 - qv) * -10);
   $('query').querySelector('.live').style.opacity = (.55 + .45 * Math.sin(t * 5)).toFixed(3);
