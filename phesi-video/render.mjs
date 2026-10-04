@@ -10,8 +10,25 @@ const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 const here = new URL('.', import.meta.url).pathname;
 
 const font = fs.readFileSync(here + 'inter.woff2').toString('base64');
+
+// Brand font: drop Franie Regular and SemiBold files (.woff2/.woff/.otf/.ttf) into fonts/.
+// Until they are there, the video falls back to Inter.
+const FONT_TYPES = { woff2: 'woff2', woff: 'woff', otf: 'opentype', ttf: 'truetype' };
+const fontFiles = fs.existsSync(here + 'fonts') ? fs.readdirSync(here + 'fonts') : [];
+function brandFace(test, weight) {
+  const f = fontFiles.find(n => /franie/i.test(n) && test.test(n) && FONT_TYPES[n.split('.').pop().toLowerCase()]);
+  if (!f) return '';
+  const ext = f.split('.').pop().toLowerCase();
+  const data = fs.readFileSync(here + 'fonts/' + f).toString('base64');
+  console.log(`using ${f} for weight ${weight}`);
+  return `  @font-face { font-family: "Franie"; src: url(data:font/${ext};base64,${data}) format("${FONT_TYPES[ext]}"); font-weight: ${weight}; }\n`;
+}
+const brandFonts = brandFace(/regular|book|-400/i, 400) + brandFace(/semi.?bold|-600/i, 600);
+if (!brandFonts) console.log('Franie font files not found in fonts/; using Inter');
+
 const html = fs.readFileSync(here + 'scene.html', 'utf8')
   .replace('__FONT__', 'data:font/woff2;base64,' + font)
+  .replace('__BRANDFONTS__', brandFonts)
   .replace('__DOTS__', fs.readFileSync(here + 'dots.json', 'utf8'));
 fs.writeFileSync(here + 'phesi-trial-accelerator.html', html);
 

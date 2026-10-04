@@ -5,60 +5,62 @@
 <title>Phesi Trial Accelerator</title>
 <style>
   @font-face { font-family: "InterV"; src: url(__FONT__) format("woff2"); font-weight: 100 900; }
+__BRANDFONTS__
   :root {
-    --bg: #050F22; --ink: #F3F7FF; --muted: #8FA3C2; --teal: #22D3C5; --blue: #4C9BFF; --pink: #FF4F8B;
+    /* Phesi brand: Navy, Green; Bright Mint is reserved for call-to-action elements */
+    --navy: #011835; --green: #1c8c80; --mint: #34ffe0;
+    --bg: var(--navy); --ink: #F3F7FF; --muted: #9AACC6;
+    --body: "Franie", "InterV", system-ui, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
-  body { font-family: "InterV", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  body { font-family: var(--body); font-weight: 400; color: var(--ink); -webkit-font-smoothing: antialiased; }
   #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
   canvas { position: absolute; inset: 0; }
   .layer { position: absolute; will-change: transform, opacity; opacity: 0; }
-  .eyebrow { font-size: 22px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--teal); }
+  .eyebrow { font-size: 22px; font-weight: 400; letter-spacing: .22em; text-transform: uppercase; color: var(--green); }
   .h1 { font-size: 132px; font-weight: 750; letter-spacing: -.035em; line-height: 1; }
   .h2 { font-size: 76px; font-weight: 720; letter-spacing: -.03em; line-height: 1.04; }
-  .h3 { font-size: 54px; font-weight: 700; letter-spacing: -.025em; line-height: 1.08; }
-  .sub { font-size: 30px; font-weight: 420; color: var(--muted); line-height: 1.4; }
-  .accent { color: var(--teal); }
-  .pink { color: var(--pink); }
-  .grad { background: linear-gradient(90deg, var(--teal), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .h3 { font-size: 54px; font-weight: 600; letter-spacing: -.025em; line-height: 1.08; }
+  .sub { font-size: 30px; font-weight: 400; color: var(--muted); line-height: 1.4; }
+  .accent { color: var(--green); }
 
 
   /* Bottom caption band */
   .cap { left: 120px; top: 862px; width: 1080px; }
   .cap .h3 { margin: 14px 0 12px; }
   .cap .sub { font-size: 26px; }
-  .band { position: absolute; left: 0; right: 0; top: 820px; height: 260px; background: linear-gradient(180deg, rgba(5,15,34,0), rgba(5,15,34,.92) 30%, #050F22); opacity: 0; }
+  .band { position: absolute; left: 0; right: 0; top: 820px; height: 260px; background: linear-gradient(180deg, rgba(1,24,53,0), rgba(1,24,53,.92) 30%, var(--navy)); opacity: 0; }
 
   /* Region labels */
-  .region { font-size: 19px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); padding: 8px 14px; border-radius: 8px; background: rgba(5,15,34,.75); border: 1px solid rgba(76,155,255,.4); white-space: nowrap; }
+  .region { font-size: 19px; font-weight: 400; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); padding: 8px 14px; border-radius: 8px; background: rgba(1,24,53,.8); border: 1px solid rgba(28,140,128,.6); white-space: nowrap; }
 
   /* AI panel */
   #ai { left: 1290px; top: 862px; width: 520px; }
-  #ai .top { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; }
-  #ai .top .live { width: 12px; height: 12px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 14px var(--pink); }
-  .stage { display: flex; align-items: center; gap: 16px; font-size: 24px; font-weight: 520; padding: 7px 0; color: var(--muted); }
+  #ai .top { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 400; letter-spacing: .16em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
+  #ai .top .live { width: 12px; height: 12px; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px var(--green); }
+  .stage { display: flex; align-items: center; gap: 16px; font-size: 24px; font-weight: 400; padding: 7px 0; color: var(--muted); }
   .stage .b { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(143,163,194,.5); flex: none; display: grid; place-items: center; }
   .stage.on { color: var(--ink); }
-  .stage.on .b { background: var(--teal); border-color: var(--teal); }
-  .stage.on .b::after { content: '✓'; font-size: 16px; font-weight: 800; color: #050F22; }
+  .stage.on .b { background: var(--green); border-color: var(--green); }
+  .stage.on .b::after { content: '✓'; font-size: 16px; font-weight: 600; color: var(--navy); }
 
   /* Scene 7 */
   #s7 { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  #s7 .line { font-size: 92px; font-weight: 740; letter-spacing: -.035em; line-height: 1.12; opacity: 0; }
+  #s7 .line { font-size: 92px; font-weight: 600; letter-spacing: -.035em; line-height: 1.12; opacity: 0; }
   #benefits { display: flex; gap: 28px; margin-top: 70px; }
-  .ben { width: 470px; text-align: left; padding: 34px 36px; border-radius: 22px; background: rgba(12,32,66,.8); border: 1.5px solid rgba(76,155,255,.28); opacity: 0; }
-  .ben .n { font-size: 20px; font-weight: 700; letter-spacing: .16em; color: var(--teal); }
-  .ben .t { font-size: 32px; font-weight: 700; margin: 12px 0 10px; letter-spacing: -.01em; }
+  .ben { width: 470px; text-align: left; padding: 34px 36px; border-radius: 22px; background: rgba(4,36,74,.85); border: 1.5px solid rgba(28,140,128,.5); opacity: 0; }
+  .ben .n { font-size: 20px; font-weight: 400; letter-spacing: .16em; color: var(--green); }
+  .ben .t { font-size: 32px; font-weight: 600; margin: 12px 0 10px; letter-spacing: -.01em; }
   .ben .d { font-size: 22px; color: var(--muted); line-height: 1.4; }
 
   /* End card */
   #end { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  #end .word { font-size: 180px; font-weight: 780; letter-spacing: -.05em; line-height: 1; }
+  #end .word { font-size: 180px; font-weight: 600; letter-spacing: -.05em; line-height: 1; }
   #end .prod { font-size: 50px; font-weight: 600; letter-spacing: -.01em; margin-top: 18px; }
   #end .tag { margin-top: 44px; }
-  #end .tm { font-size: 24px; font-weight: 600; vertical-align: super; margin-left: 4px; color: var(--blue); }
-  #end .url { margin-top: 60px; font-size: 34px; font-weight: 600; letter-spacing: .06em; padding: 18px 40px; border-radius: 60px; border: 1.5px solid rgba(34,211,197,.6); color: var(--teal); }
+  #end .tm { font-size: 24px; font-weight: 400; vertical-align: super; margin-left: 4px; color: var(--green); }
+  #end .url { margin-top: 60px; font-size: 34px; font-weight: 600; letter-spacing: .04em; padding: 20px 46px; border-radius: 60px; background: var(--mint); color: var(--navy); box-shadow: 0 0 40px rgba(52,255,224,.35); }
 </style>
 </head>
 <body>
@@ -93,7 +95,7 @@
   <!-- 6. KOLs -->
   <div class="layer cap" id="c6" style="width:1700px">
     <div class="eyebrow">Target the right experts</div>
-    <div class="h3">Key opinion leaders, <span class="pink">relevant to your protocol</span></div>
+    <div class="h3">Key opinion leaders, <span class="accent">relevant to your protocol</span></div>
     <div class="sub">Find the investigators and sites with access to the right patient populations.</div>
   </div>
 
@@ -101,7 +103,7 @@
   <div class="layer" id="s7">
     <div class="line" id="l0">The right patients.</div>
     <div class="line" id="l1">The right experts.</div>
-    <div class="line grad" id="l2">Anywhere in the world.</div>
+    <div class="line accent" id="l2">Anywhere in the world.</div>
     <div id="benefits">
       <div class="ben" id="b0"><div class="n">PRECISION</div><div class="t">Exact patient profiles</div><div class="d">From protocol to the patients who truly fit it.</div></div>
       <div class="ben" id="b1"><div class="n">SCALE</div><div class="t">Largest global data source</div><div class="d">Every region, one platform.</div></div>
@@ -112,7 +114,7 @@
   <!-- End card -->
   <div class="layer" id="end">
     <div class="word">Phesi</div>
-    <div class="prod">Trial <span class="grad">Accelerator</span><sup class="tm">&trade;</sup></div>
+    <div class="prod">Trial <span class="accent">Accelerator</span><sup class="tm">&trade;</sup></div>
     <div class="sub tag">Find the right patients, faster.</div>
     <div class="url">www.phesi.com</div>
   </div>
@@ -178,7 +180,7 @@ function render(vt) {
   const t = vt + OFFSET;
   // background
   const g = cx.createRadialGradient(960, 430, 100, 960, 540, 1250);
-  g.addColorStop(0, '#0B2144'); g.addColorStop(1, '#040C1C');
+  g.addColorStop(0, '#04284F'); g.addColorStop(1, '#011835');
   cx.fillStyle = g; cx.fillRect(0, 0, W, H);
 
   // ---- map ----
@@ -196,10 +198,10 @@ function render(vt) {
     const tw = .82 + .18 * Math.sin(t * 2.2 + d.tw);
     let alpha = preview + appear * .55 * tw;
     let r = 2.4 + flash * 3.2;
-    let col = '76,155,255';
+    let col = '154,172,198';
     if (aiOn && d.x < beamX) {
       const k = cl((beamX - d.x) / 160);
-      if (d.m) { col = '255,79,139'; alpha = lerp(alpha, .95 * tw, k); r = lerp(r, 3.3, k); }
+      if (d.m) { col = '28,140,128'; alpha = lerp(alpha, .95 * tw, k); r = lerp(r, 3.3, k); }
       else alpha = lerp(alpha, .1, k);
     }
     if (d.m && kolDim > 0) alpha = lerp(alpha, .45 + .25 * tw, kolDim);
@@ -207,16 +209,16 @@ function render(vt) {
     if (alpha < .01) continue;
     cx.fillStyle = `rgba(${col},${alpha.toFixed(3)})`;
     cx.beginPath(); cx.arc(d.x + drift, d.y, r, 0, 6.283); cx.fill();
-    if (flash > .2) { cx.fillStyle = `rgba(34,211,197,${(flash * .25).toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, r * 2.6, 0, 6.283); cx.fill(); }
+    if (flash > .2) { cx.fillStyle = `rgba(28,140,128,${(flash * .35).toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, r * 2.6, 0, 6.283); cx.fill(); }
   }
 
   // AI scan beam
   if (t > 28.6 && t < 33.4) {
     const bg = cx.createLinearGradient(beamX - 220, 0, beamX + 8, 0);
-    bg.addColorStop(0, 'rgba(34,211,197,0)'); bg.addColorStop(.92, 'rgba(34,211,197,.16)'); bg.addColorStop(1, 'rgba(34,211,197,.0)');
+    bg.addColorStop(0, 'rgba(28,140,128,0)'); bg.addColorStop(.92, 'rgba(28,140,128,.22)'); bg.addColorStop(1, 'rgba(28,140,128,0)');
     cx.fillStyle = bg; cx.fillRect(beamX - 220, 0, 228, 860);
-    cx.fillStyle = 'rgba(160,255,245,.95)'; cx.fillRect(beamX - 1.5, 0, 3, 860);
-    cx.shadowColor = '#22D3C5'; cx.shadowBlur = 30; cx.fillRect(beamX - 1, 0, 2, 860); cx.shadowBlur = 0;
+    cx.fillStyle = 'rgba(243,247,255,.95)'; cx.fillRect(beamX - 1.5, 0, 3, 860);
+    cx.shadowColor = '#1c8c80'; cx.shadowBlur = 30; cx.fillRect(beamX - 1, 0, 2, 860); cx.shadowBlur = 0;
   }
 
   // KOL network
@@ -228,7 +230,7 @@ function render(vt) {
       const q = eio(pr(t, B.t0, B.t0 + 1.1));
       if (q <= 0) continue;
       const mx = (A.p[0] + B.p[0]) / 2, my = Math.min(A.p[1], B.p[1]) - Math.hypot(B.p[0] - A.p[0], B.p[1] - A.p[1]) * .28;
-      cx.strokeStyle = `rgba(34,211,197,${(.5 * kf).toFixed(3)})`; cx.lineWidth = 2; cx.setLineDash([]);
+      cx.strokeStyle = `rgba(28,140,128,${(.5 * kf).toFixed(3)})`; cx.lineWidth = 2; cx.setLineDash([]);
       cx.beginPath();
       for (let s = 0; s <= 40 * q; s++) {
         const u = s / 40, x = (1 - u) * (1 - u) * A.p[0] + 2 * (1 - u) * u * mx + u * u * B.p[0], y = (1 - u) * (1 - u) * A.p[1] + 2 * (1 - u) * u * my + u * u * B.p[1];
@@ -236,7 +238,7 @@ function render(vt) {
       }
       cx.stroke();
     }
-    cx.font = '600 19px InterV'; cx.textAlign = 'center';
+    cx.font = '400 19px Franie, InterV'; cx.textAlign = 'center';
     for (const k of KOLS) {
       const q = eo(pr(t, k.t0, k.t0 + .7));
       if (q <= 0) continue;
@@ -244,20 +246,20 @@ function render(vt) {
       k.near.forEach((d, j) => {
         const u = eo(pr(t, k.t0 + .25 + j * .06, k.t0 + .75 + j * .06));
         if (u <= 0) return;
-        cx.strokeStyle = `rgba(255,79,139,${(.55 * kf).toFixed(3)})`; cx.lineWidth = 1.5;
+        cx.strokeStyle = `rgba(28,140,128,${(.7 * kf).toFixed(3)})`; cx.lineWidth = 1.5;
         cx.beginPath(); cx.moveTo(k.p[0], k.p[1]); cx.lineTo(lerp(k.p[0], d.x, u), lerp(k.p[1], d.y, u)); cx.stroke();
-        cx.fillStyle = `rgba(255,79,139,${kf.toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, 3.8 * u, 0, 6.283); cx.fill();
+        cx.fillStyle = `rgba(28,140,128,${kf.toFixed(3)})`; cx.beginPath(); cx.arc(d.x, d.y, 3.8 * u, 0, 6.283); cx.fill();
       });
       const pulse = ((t - k.t0) % 2) / 2;
-      cx.strokeStyle = `rgba(34,211,197,${((1 - pulse) * .6 * q * kf).toFixed(3)})`; cx.lineWidth = 2;
+      cx.strokeStyle = `rgba(28,140,128,${((1 - pulse) * .6 * q * kf).toFixed(3)})`; cx.lineWidth = 2;
       cx.beginPath(); cx.arc(k.p[0], k.p[1], 14 + pulse * 34, 0, 6.283); cx.stroke();
-      cx.fillStyle = `rgba(5,15,34,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 15 * q, 0, 6.283); cx.fill();
-      cx.strokeStyle = `rgba(34,211,197,${kf})`; cx.lineWidth = 3; cx.stroke();
-      cx.fillStyle = `rgba(34,211,197,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 6 * q, 0, 6.283); cx.fill();
+      cx.fillStyle = `rgba(1,24,53,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 15 * q, 0, 6.283); cx.fill();
+      cx.strokeStyle = `rgba(28,140,128,${kf})`; cx.lineWidth = 3; cx.stroke();
+      cx.fillStyle = `rgba(28,140,128,${kf})`; cx.beginPath(); cx.arc(k.p[0], k.p[1], 6 * q, 0, 6.283); cx.fill();
       const lq = eo(pr(t, k.t0 + .3, k.t0 + .9)) * kf;
       if (lq > 0) {
         const label = 'KOL · ' + k.n, tw2 = cx.measureText(label).width + 22, ly = k.p[1] + (k.below ? 46 : -44) + (1 - lq) * 8;
-        cx.fillStyle = `rgba(5,15,34,${(.85 * lq).toFixed(3)})`; cx.strokeStyle = `rgba(34,211,197,${(.5 * lq).toFixed(3)})`; cx.lineWidth = 1;
+        cx.fillStyle = `rgba(1,24,53,${(.85 * lq).toFixed(3)})`; cx.strokeStyle = `rgba(28,140,128,${(.5 * lq).toFixed(3)})`; cx.lineWidth = 1;
         cx.beginPath(); cx.roundRect(k.p[0] - tw2 / 2, ly - 17, tw2, 32, 7); cx.fill(); cx.stroke();
         cx.fillStyle = `rgba(243,247,255,${lq.toFixed(3)})`; cx.fillText(label, k.p[0], ly + 6);
       }
@@ -265,7 +267,7 @@ function render(vt) {
   }
 
   const fadeIn = 1 - eo(pr(vt, 0, .8));
-  if (fadeIn > 0) { cx.fillStyle = `rgba(4,12,28,${fadeIn.toFixed(3)})`; cx.fillRect(0, 0, W, H); }
+  if (fadeIn > 0) { cx.fillStyle = `rgba(1,24,53,${fadeIn.toFixed(3)})`; cx.fillRect(0, 0, W, H); }
 
   // ---------- DOM layers ----------
 

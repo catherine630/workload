@@ -18,3 +18,7 @@ The original opening scenes (title, new drug, patient profile) were removed; `OF
 - Re-render: `npm i playwright world-atlas topojson-client d3-geo imageio-ffmpeg`, then run
   `FFMPEG=/path/to/ffmpeg node render.mjs`. For review stills: `node render.mjs stills 10 30`.
 - `build-dots.mjs` regenerates the dotted world map (`dots.json`) from Natural Earth land data.
+
+## Brand
+- Colours: Phesi Navy `#011835` (background), Phesi Green `#1c8c80` (highlights, map, hubs), Bright Mint `#34ffe0` (call-to-action elements only).
+- Font: Franie Regular for body text, Franie SemiBold for headings. Put the font files in `fonts/` with "Franie" plus "Regular"/"SemiBold" in their names, then re-render; until then the video falls back to Inter.
