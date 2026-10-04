@@ -29,6 +29,7 @@ if (!brandFonts) console.log('Franie font files not found in fonts/; using Inter
 const html = fs.readFileSync(here + 'scene.html', 'utf8')
   .replace('__FONT__', 'data:font/woff2;base64,' + font)
   .replace('__BRANDFONTS__', brandFonts)
+  .replace('__LOGO__', 'data:image/png;base64,' + fs.readFileSync(here + 'logo-white.png').toString('base64'))
   .replace('__DOTS__', fs.readFileSync(here + 'dots.json', 'utf8'));
 fs.writeFileSync(here + 'phesi-trial-accelerator.html', html);
 

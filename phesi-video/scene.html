@@ -56,7 +56,7 @@ __BRANDFONTS__
 
   /* End card */
   #end { left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  #end .word { font-size: 180px; font-weight: 600; letter-spacing: -.05em; line-height: 1; }
+  #end .logo { width: 820px; height: auto; display: block; margin-bottom: 36px; }
   #end .prod { font-size: 50px; font-weight: 600; letter-spacing: -.01em; margin-top: 18px; }
   #end .tag { margin-top: 44px; }
   #end .tm { font-size: 24px; font-weight: 400; vertical-align: super; margin-left: 4px; color: var(--green); }
@@ -113,7 +113,7 @@ __BRANDFONTS__
 
   <!-- End card -->
   <div class="layer" id="end">
-    <div class="word">Phesi</div>
+    <img class="logo" src="__LOGO__" alt="Phesi: Smarter trials. Faster cures.">
     <div class="prod">Trial <span class="accent">Accelerator</span><sup class="tm">&trade;</sup></div>
     <div class="sub tag">Find the right patients, faster.</div>
     <div class="url">www.phesi.com</div>
@@ -179,9 +179,7 @@ const stages = [$('st0')];
 function render(vt) {
   const t = vt + OFFSET;
   // background
-  const g = cx.createRadialGradient(960, 430, 100, 960, 540, 1250);
-  g.addColorStop(0, '#04284F'); g.addColorStop(1, '#011835');
-  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  cx.fillStyle = '#011835'; cx.fillRect(0, 0, W, H);   // Phesi Navy, flat
 
   // ---- map ----
   const mapFade = 1 - eio(pr(t, 44, 45.2)) * .88 - eio(pr(t, 49.4, 50.4)) * .12;
