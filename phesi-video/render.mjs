@@ -48,13 +48,18 @@ if (mode === 'stills') {
   }
 } else {
   const out = here + 'phesi-trial-accelerator.mp4';
-  const ff = spawn(FFMPEG, ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out],
+  // Lossless PNG frames, converted with the BT.709 matrix and tagged as BT.709 so players
+  // reproduce the brand colours exactly instead of guessing the colour space.
+  const ff = spawn(FFMPEG, ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
+    '-vf', 'scale=out_color_matrix=bt709:out_range=tv:flags=accurate_rnd+full_chroma_int,format=yuv420p',
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', '16',
+    '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
+    '-movflags', '+faststart', out],
     { stdio: ['pipe', 'inherit', 'inherit'] });
   const frames = Math.round(duration * FPS);
   for (let f = 0; f < frames; f++) {
     await page.evaluate(t => window.render(t), f / FPS);
-    const buf = await page.screenshot({ type: 'jpeg', quality: 95 });
+    const buf = await page.screenshot({ type: 'png' });
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
     if (f % 150 === 0) console.log(`frame ${f}/${frames}`);
   }
